@@ -188,7 +188,7 @@ const updateCar = async (req: Request, res: Response) => {
     try{
         const cars=await CarModel.find({ userId: user });
         res.status(200).json({
-            "message":"All Cars fetched Successfully",
+            "message":"All Cars fetched Successfully ",
             "properties":cars,
             "status":"success"
         });
