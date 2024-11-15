@@ -12,7 +12,9 @@ const upload = multer({ storage });
 
 //candidates data routes
 router.post("/car",upload.array("images", 10), authenticateToken, carController.addCar);
+router.get("/getCar/:id", authenticateToken, carController.getCar);
 router.get("/getAllCar", authenticateToken, carController.getAllCar);
+
 
 router.get("/deleteCar/:id", authenticateToken, carController.deleteCar);
 router.get("/deleteAllCar", authenticateToken, carController.deleteAllCar);

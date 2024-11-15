@@ -25,8 +25,6 @@ cloudinary.v2.config({
 
 
 const addCar = async (req: Request, res: Response) => {
-
-
     try {
 
         const userId = req.userId;
@@ -152,6 +150,33 @@ const getAllCar = async (req: Request, res: Response) => {
 
 
 
+const getCar = async (req: Request, res: Response) => {
+    const carId = req.params.id
+    try{
+        const car = await CarModel.findById(carId);
+
+        if (!car) {
+            return res.status(404).json({ message: 'Car not found' });
+        }
+
+        if (car.ownerId.toString() !== req.userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // If the owner matches, return the car details
+        res.status(200).json({
+            message: 'Car fetched successfully',
+            car: car,
+            status: 'success'
+        });
+    }
+    catch(error){
+        res.status(500).json({message: error});
+    }
+}
+
+
+
 /**
  *
  * It returns all the Updated Cars
@@ -182,5 +207,6 @@ export default {
     deleteCar,
     deleteAllCar,
     getAllCar,
-    updateCar
+    updateCar,
+    getCar
 };

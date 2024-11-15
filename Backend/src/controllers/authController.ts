@@ -51,7 +51,7 @@ export const register = async (req: Request, res: Response) => {
     await user.save();
 
     res.status(201).json({
-      message: "User Added Successful, Restricted Control",
+      message: "User Added Successful",
     });
 
   } catch (err) {
