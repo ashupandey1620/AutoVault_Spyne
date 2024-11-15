@@ -4,6 +4,7 @@ import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCreation from "./ProductCreation";
 import Wrapper from "../wrapper/page";
 import { Navbar } from "./Navbar";
+import { BASE_URL } from "../data";
 
 const mock_cars = [
   {
@@ -123,7 +124,7 @@ const mock_cars = [
 
 export default function ProductList() {
   const navigate = useNavigate();
-  const [cars, setCars] = useState(mock_cars);
+  const [cars, setCars] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCars, setFilteredCars] = useState([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -145,11 +146,24 @@ export default function ProductList() {
   }, [searchTerm, cars]);
 
   const fetchCars = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("authorization", localStorage.getItem("access_token"));
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
     try {
-      const response = await fetch("/api/listProducts");
+      const response = await fetch(
+        `${BASE_URL}/api/auth/getAllCar`,
+        requestOptions
+      );
       if (response.ok) {
         const data = await response.json();
-        setCars(data);
+        console.log(data);
+        setCars(data.cars);
       } else {
         console.error("Failed to fetch cars");
       }
@@ -177,7 +191,7 @@ export default function ProductList() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCars.map((car) => (
-            <CarCard key={car.id} car={car} />
+            <CarCard key={car._id} car={car} />
           ))}
         </div>
         <div
@@ -190,7 +204,9 @@ export default function ProductList() {
           <Plus className="w-6 h-6" />
         </div>
       </div>
-      {addModalOpen && <ProductCreation setAddModalOpen={setAddModalOpen} />}
+      {addModalOpen && <ProductCreation setAddModalOpen={setAddModalOpen}
+        onClick={() => { fetchCars(); }}
+      />}
     </div>
   );
 }
@@ -210,13 +226,12 @@ function CarCard({ car }) {
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden transform transition duration-300 ease-in-out hover:shadow-xl">
-      <Link to={`/products/${car.id}`}>
+      <Link to={`/products/${car._id}`}>
         <div className="relative h-64 overflow-hidden group">
           <img
             src={car.images[currentImageIndex]}
             alt={`${car.title} - img ${currentImageIndex + 1}`}
             layout="fill"
-            objectFit="cover"
             className="transform transition duration-300 ease-in-out hover:scale-110"
           />
           <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition duration-300 ease-in-out" />
@@ -277,7 +292,6 @@ function CarCard({ car }) {
                   alt={`${car.title} - Thumbnail ${index + 1}`}
                   // width={64}
                   // height={64}
-                  objectFit=""
                   className="object-cover w-full h-full"
                 />
               </button>

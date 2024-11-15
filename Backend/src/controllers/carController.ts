@@ -184,13 +184,75 @@ const getCar = async (req: Request, res: Response) => {
  */
 
 const updateCar = async (req: Request, res: Response) => {
-    const user = req.userId;
+    const { id, title, description, images_link } = req.body;
+    console.log(req.body);
+    console.log(req.files);
     try{
-        const cars=await CarModel.find({ userId: user });
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+        }
+
+        console.log(`User Id is ${userId}`);
+        console.log("Car ID is ", id);
+        console.log("Title is ", title);
+        console.log("Description is ", description);
+        console.log("Existing image links are ", images_link);
+
+
+        const car = await CarModel.findById(id);
+
+        if (!car) {
+            return res.status(404).json({ message: "Car not found" });
+        }
+
+        // Check if the user is the owner of the car
+        if (car.ownerId.toString() !== userId.toString()) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        // Update the car details
+        if (title) car.title = title;
+        if (description) car.description = description;
+
+        // If new images are uploaded, upload them to Cloudinary and add to images_link array
+        if (Array.isArray(req.files) && req.files.length > 0) {
+            const files = req.files as Express.Multer.File[];
+
+            const uploadedImages = await Promise.all(
+                files.map(
+                    (file) =>
+                        new Promise<string>((resolve, reject) => {
+                            const uploadStream = cloudinary.v2.uploader.upload_stream(
+                                { folder: "cars" },
+                                (error, result) => {
+                                    if (error) return reject(error);
+                                    if (result) resolve(result.secure_url);
+                                }
+                            );
+                            uploadStream.end(file.buffer); // Pass the file buffer to the stream
+                        })
+                )
+            );
+
+            // Add the new image links to the existing images_link array
+            car.images.push(...uploadedImages);
+        }
+
+
+        // Update the images_link field with the new array if provided
+        if (images_link) {
+            car.images = [...new Set([...car.images, ...images_link])]; // Prevent duplicates
+        }
+
+        // Save the updated car
+        await car.save();
+
         res.status(200).json({
-            "message":"All Cars fetched Successfully ",
-            "properties":cars,
-            "status":"success"
+            message: "Car updated successfully",
+            status: "success",
+            car: car,
         });
     }
     catch(error){

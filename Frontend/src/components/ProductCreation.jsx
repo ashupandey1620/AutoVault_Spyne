@@ -1,8 +1,11 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Upload, Loader2, ArrowLeft } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
+import { BASE_URL } from '../data';
 
-export default function ProductCreation({setAddModalOpen}) {
+export default function ProductCreation({ setAddModalOpen,
+  onClick
+ }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
@@ -19,27 +22,45 @@ export default function ProductCreation({setAddModalOpen}) {
     setIsSubmitting(true);
     setError('');
 
+    const myHeaders = new Headers();
+    myHeaders.append(
+      'authorization',
+      localStorage.getItem('access_token')
+    );
+
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('tags', tags);
-    images.forEach((image, index) => {
-      formData.append(`image${index}`, image);
+    formData.append(
+      'tags',
+      JSON.stringify({
+        carType: tags.split(',')[0]?.trim() || '',
+        company: tags.split(',')[1]?.trim() || '',
+        dealer: tags.split(',')[2]?.trim() || '',
+      })
+    );
+    images.forEach((image) => {
+      formData.append('images', image);
     });
 
     try {
-      const response = await fetch('/api/createProduct', {
+      const response = await fetch(`${BASE_URL}/api/auth/car`, {
         method: 'POST',
+        headers: myHeaders,
         body: formData,
+        redirect: 'follow',
       });
 
       if (response.ok) {
         setSuccess(true);
         setTimeout(() => {
           navigate('/products');
+          setAddModalOpen(false);
+          onClick();
         }, 2000);
       } else {
-        setError('Failed to create product. Please try again.');
+        const errorText = await response.text();
+        setError(`Failed to create product. ${errorText}`);
       }
     } catch (error) {
       setError('Error creating product. Please check your connection and try again.');
@@ -69,140 +90,139 @@ export default function ProductCreation({setAddModalOpen}) {
   };
 
   return (
-    <div className="fixed flex justify-center items-center z-30 p-4 inset-0  backdrop-blur-sm backdrop-brightness-50">
-    <div className="w-[50%] bg-gray-50 flex flex-col rounded-xl"> 
-      <main className="flex-grow flex items-center justify-center">
-        <div className="w-full max-w-3xl">
-          <form onSubmit={handleSubmit} className=" p-8 space-y-8">
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-                  placeholder="Enter car title"
-                />
-              </div>
+    <div className="fixed flex justify-center items-center z-30 p-4 inset-0 backdrop-blur-sm backdrop-brightness-50">
+      <div className="w-[80%] bg-gray-50 flex flex-col rounded-xl overflow-y-auto h-[95%]">
+        <main className="flex-grow flex items-center justify-center">
+          <div className="w-full max-w-3xl">
+            <form onSubmit={handleSubmit} className="p-8 space-y-8">
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                    placeholder="Enter car title"
+                  />
+                </div>
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                  rows={4}
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-                  placeholder="Describe the car"
-                ></textarea>
-              </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                    rows={4}
+                    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                    placeholder="Describe the car"
+                  ></textarea>
+                </div>
 
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
-                  Tags (comma-separated)
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-                  placeholder="e.g. sedan, electric, luxury"
-                />
-              </div>
+                <div>
+                  <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+                    Tags (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    id="tags"
+                    value={tags}
+                    placeholder="carType, company, dealer"
+                    onChange={(e) => setTags(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                  />
+                </div>
 
-              <div>
-                <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
-                  Images (up to 10)
-                </label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:bg-gray-50 transition duration-200 ease-in-out">
-                  <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label
-                        htmlFor="images"
-                        className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
-                      >
-                        <span>Upload images</span>
-                        <input
-                          id="images"
-                          name="images"
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          className="sr-only"
-                          onChange={handleImageChange}
-                          ref={fileInputRef}
-                        />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
+                <div>
+                  <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
+                    Images (up to 10)
+                  </label>
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:bg-gray-50 transition duration-200 ease-in-out">
+                    <div className="space-y-1 text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      <div className="flex text-sm text-gray-600">
+                        <label
+                          htmlFor="images"
+                          className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                        >
+                          <span>Upload images</span>
+                          <input
+                            id="images"
+                            name="images"
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={handleImageChange}
+                            ref={fileInputRef}
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {previews.length > 0 && (
-              <div className="flex flex-wrap gap-4">
-                {previews.map((preview, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      width={100}
-                      height={100}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+              {previews.length > 0 && (
+                <div className="flex flex-wrap gap-4">
+                  {previews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        width={100}
+                        height={100}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 transform translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setAddModalOpen(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 border border-transparent rounded-xl text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 inline" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create Car Entry'
+                  )}
+                </button>
               </div>
-            )}
-
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => setAddModalOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 border border-transparent rounded-xl text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 inline" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Car Entry'
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-    </div>
+            </form>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
