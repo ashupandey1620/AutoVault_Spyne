@@ -5,7 +5,7 @@ import cors from 'cors';
 import authRoutes from "./routes/authRoutes";
 
 import morgan from 'morgan';
-import candidatesRoutes from "./routes/ManagementRoutes";
+import candidatesRoutes from "./routes/carRoutes";
 dotenv.config();
 const app = express();
 const host = "0.0.0.0";
@@ -27,7 +27,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use(morgan('tiny'));
 app.use('/api', authRoutes);
-app.use('/api', candidatesRoutes);
+app.use('/api/auth/', candidatesRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
