@@ -1,0 +1,115 @@
+export const mock_cars = [
+  {
+    id: "1",
+    title: "Toyota Camry",
+    description:
+      "A reliable sedan with excellent fuel efficiency and a smooth ride.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Sedan", company: "Toyota", dealer: "City Car Dealers" },
+    ownerId: "user001",
+    createdAt: "2024-01-15",
+    updatedAt: "2024-01-20",
+  },
+  {
+    id: "2",
+    title: "Ford Mustang",
+    description:
+      "A classic American muscle car with impressive power and design.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Coupe", company: "Ford", dealer: "AutoNation" },
+    ownerId: "user002",
+    createdAt: "2024-02-10",
+    updatedAt: "2024-02-12",
+  },
+  {
+    id: "3",
+    title: "Honda Civic",
+    description:
+      "An affordable, compact car with great fuel economy and reliability.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Sedan", company: "Honda", dealer: "Best Cars" },
+    ownerId: "user003",
+    createdAt: "2024-03-05",
+    updatedAt: "2024-03-10",
+  },
+  {
+    id: "4",
+    title: "Tesla Model S",
+    description:
+      "A high-performance electric car with cutting-edge technology.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Electric", company: "Tesla", dealer: "Tesla Dealership" },
+    ownerId: "user004",
+    createdAt: "2024-04-22",
+    updatedAt: "2024-04-25",
+  },
+  {
+    id: "5",
+    title: "Chevrolet Silverado",
+    description: "A durable and versatile pickup truck with plenty of power.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Truck", company: "Chevrolet", dealer: "Trucks R Us" },
+    ownerId: "user005",
+    createdAt: "2024-05-01",
+    updatedAt: "2024-05-03",
+  },
+  {
+    id: "6",
+    title: "BMW 3 Series",
+    description:
+      "A luxury sedan offering a blend of comfort, performance, and style.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Sedan", company: "BMW", dealer: "Luxury Autos" },
+    ownerId: "user006",
+    createdAt: "2024-06-18",
+    updatedAt: "2024-06-20",
+  },
+  {
+    id: "7",
+    title: "Audi Q7",
+    description:
+      "A spacious and elegant SUV, perfect for family trips and adventures.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "SUV", company: "Audi", dealer: "Audi Center" },
+    ownerId: "user007",
+    createdAt: "2024-07-10",
+    updatedAt: "2024-07-12",
+  },
+  {
+    id: "8",
+    title: "Mercedes-Benz C-Class",
+    description:
+      "A sophisticated luxury sedan with advanced features and smooth handling.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: {
+      carType: "Sedan",
+      company: "Mercedes-Benz",
+      dealer: "Premium Motors",
+    },
+    ownerId: "user008",
+    createdAt: "2024-08-01",
+    updatedAt: "2024-08-03",
+  },
+  {
+    id: "9",
+    title: "Nissan Altima",
+    description:
+      "A comfortable and reliable mid-size sedan with great mileage.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "Sedan", company: "Nissan", dealer: "Value Autos" },
+    ownerId: "user009",
+    createdAt: "2024-09-15",
+    updatedAt: "2024-09-17",
+  },
+  {
+    id: "10",
+    title: "Jeep Wrangler",
+    description:
+      "A rugged SUV, ideal for off-road adventures and exploring the outdoors.",
+    images: ["/test_car.png", "/test_car2.png"],
+    tags: { carType: "SUV", company: "Jeep", dealer: "Adventure Autos" },
+    ownerId: "user010",
+    createdAt: "2024-10-05",
+    updatedAt: "2024-10-07",
+  },
+];
